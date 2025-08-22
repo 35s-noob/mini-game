@@ -1,0 +1,13 @@
+body { margin: 0; overflow: hidden; background: #222; color: #fff; }
+canvas { display: block; margin: auto; background: #333; }
+#killLog {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 350px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: white;
+    text-align: right;
+    pointer-events: none;
+}
