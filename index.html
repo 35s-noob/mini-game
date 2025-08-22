@@ -6,12 +6,40 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>TopDown Shooter PVP (Max 10 Players)</h1>
-    <canvas id="gameCanvas"></canvas>
-    <div id="killLog"></div>
 
-    <!-- PeerJS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.7/dist/peerjs.min.js"></script>
-    <script src="game.js"></script>
+<div id="settings">
+    <h2>Player Settings</h2>
+    <label>Player Name: <input type="text" id="playerName" value="Player#1234"></label><br>
+    <label>Color: 
+        <select id="playerColor">
+            <option value="blue">Blue</option>
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+            <option value="yellow">Yellow</option>
+        </select>
+    </label><br>
+    <label>Starting Weapon:
+        <select id="playerWeapon">
+            <option>Combat Assault Rifle</option>
+            <option>Tactical Assault Rifle</option>
+            <option>Surge Assault Rifle</option>
+            <option>Elite Assault Rifle</option>
+            <option>Burst Shotgun</option>
+            <option>Light Submachine Gun</option>
+            <option>Compact Submachine Gun</option>
+            <option>Light Sniper Rifle</option>
+            <option>Heavy Sniper Rifle</option>
+            <option>Strike Pistol</option>
+            <option>Magnum Pistol</option>
+        </select>
+    </label><br>
+    <button id="startGame">Start Game</button>
+</div>
+
+<canvas id="gameCanvas" style="display:none;"></canvas>
+<div id="killLog"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.7/dist/peerjs.min.js"></script>
+<script src="game.js"></script>
 </body>
 </html>
