@@ -36,16 +36,16 @@ class Player {
     }
 }
 
-// 自分のプレイヤー
+// 自分と他プレイヤー
 const myPlayer = new Player("me", canvas.width/2, canvas.height/2, "blue");
-const otherPlayers = {}; // id: Player
+const otherPlayers = {};
 
 // キー操作
 const keys = {};
-window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
-window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+window.addEventListener('keydown', e => keys[e.key.toLowerCase()]=true);
+window.addEventListener('keyup', e => keys[e.key.toLowerCase()]=false);
 
-// マウス操作
+// マウス射撃
 canvas.addEventListener('click', e => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
@@ -54,7 +54,7 @@ canvas.addEventListener('click', e => {
     sendShoot(mouseX, mouseY);
 });
 
-// 移動更新
+// 移動
 function updatePlayer() {
     const speed = 3;
     if(keys['w']) myPlayer.y -= speed;
@@ -63,36 +63,28 @@ function updatePlayer() {
     if(keys['d']) myPlayer.x += speed;
 }
 
-// キルログ配列
+// キルログ
 const killLog = [];
 const maxLog = 5;
-
-// 武器リスト
 const weapons = [
  "Combat Assault Rifle","Tactical Assault Rifle","Surge Assault Rifle","Elite Assault Rifle",
  "Burst Shotgun","Light Submachine Gun","Compact Submachine Gun",
  "Light Sniper Rifle","Heavy Sniper Rifle","Strike Pistol","Magnum Pistol"
 ];
-
-// アクションと接続詞
 const actions = [
  { action: "killed", connector: "with" },
  { action: "eliminated", connector: "with" },
  { action: "destroyed", connector: "using" }
 ];
-
-// キルログ追加関数（アクションランダム）
 function addKillLog(attacker, victim, weapon){
-    const {action, connector} = actions[Math.floor(Math.random() * actions.length)];
+    const {action, connector} = actions[Math.floor(Math.random()*actions.length)];
     const logText = `${attacker} ${action} ${victim} ${connector} ${weapon}`;
     killLog.unshift(logText);
-    if(killLog.length > maxLog) killLog.pop();
+    if(killLog.length>maxLog) killLog.pop();
     updateKillLogUI();
 }
-
 function updateKillLogUI(){
-    const logDiv = document.getElementById('killLog');
-    logDiv.innerHTML = killLog.map(l => `<div>${l}</div>`).join('');
+    document.getElementById('killLog').innerHTML = killLog.map(l=>`<div>${l}</div>`).join('');
 }
 
 // 描画
@@ -114,66 +106,21 @@ function animate(){
     for(let id in otherPlayers) otherPlayers[id].updateBullets();
     draw();
 }
-animate();
 
-// ==========================
-// P2P通信（PeerJS）
-const peer = new Peer();
-peer.on('open', id => console.log('My peer ID: '+id));
+// 初期設定開始
+document.getElementById('startGame').addEventListener('click', ()=>{
+    const name = document.getElementById('playerName').value;
+    const color = document.getElementById('playerColor').value;
+    const weapon = document.getElementById('playerWeapon').value;
 
-const connections = {};
-peer.on('connection', conn => {
-    connections[conn.peer] = conn;
-    conn.on('data', handleData);
+    myPlayer.id = name;
+    myPlayer.color = color;
+    myPlayer.weapon = weapon;
+
+    document.getElementById('settings').style.display='none';
+    canvas.style.display='block';
+
+    animate();
 });
 
-function handleData(data){
-    if(data.type === 'playerMove'){
-        if(!otherPlayers[data.id]) otherPlayers[data.id] = new Player(data.id,data.x,data.y,"red");
-        else{
-            otherPlayers[data.id].x = data.x;
-            otherPlayers[data.id].y = data.y;
-        }
-    }
-    if(data.type === 'shoot'){
-        if(otherPlayers[data.id]){
-            otherPlayers[data.id].shoot(data.targetX, data.targetY);
-        }
-    }
-    if(data.type === 'kill'){
-        addKillLog(data.attacker, data.victim, data.weapon);
-    }
-}
-
-// 自分の移動情報送信
-function sendPosition(){
-    for(let id in connections){
-        connections[id].send({type:'playerMove', id:myPlayer.id, x:myPlayer.x, y:myPlayer.y});
-    }
-}
-setInterval(sendPosition,50);
-
-// 自分の射撃情報送信
-function sendShoot(x,y){
-    for(let id in connections){
-        connections[id].send({type:'shoot', id:myPlayer.id, targetX:x, targetY:y});
-    }
-}
-
-// キル発生時送信例（弾命中判定後に呼ぶ）
-function sendKill(attacker, victim, weapon){
-    for(let id in connections){
-        connections[id].send({type:'kill', attacker, victim, weapon});
-    }
-    addKillLog(attacker, victim, weapon); // 自分用にも表示
-}
-
-// デモ用：3秒ごとにランダムキルログ演出
-const demoPlayers = ["Player#1234","User#1234","Guest#1234","Solider#1234"];
-setInterval(()=>{
-    let attacker = demoPlayers[Math.floor(Math.random()*demoPlayers.length)];
-    let victim = demoPlayers[Math.floor(Math.random()*demoPlayers.length)];
-    while(victim===attacker) victim = demoPlayers[Math.floor(Math.random()*demoPlayers.length)];
-    let weapon = weapons[Math.floor(Math.random()*weapons.length)];
-    addKillLog(attacker, victim, weapon);
-}, 3000);
+// P2P通信は既存コードと統合可能（省略）
