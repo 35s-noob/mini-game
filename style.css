@@ -1,13 +1,17 @@
-body { margin: 0; overflow: hidden; background: #222; color: #fff; }
-canvas { display: block; margin: auto; background: #333; }
+body { margin:0; overflow:hidden; background:#222; color:#fff; font-family:Arial;}
+canvas { display:block; margin:auto; background:#333;}
 #killLog {
     position: fixed;
     top: 20px;
     right: 20px;
     width: 350px;
-    font-family: Arial, sans-serif;
     font-size: 14px;
     color: white;
     text-align: right;
     pointer-events: none;
 }
+#settings { 
+    position: fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    background:#444; padding:20px; border-radius:10px;
+}
+#settings input, #settings select, #settings button { margin-top:5px; margin-bottom:10px;}
