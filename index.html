@@ -1,23 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <title>PointerLockControls Test</title>
-  <style>
-    body { margin:0; overflow:hidden; }
-    canvas { display:block; }
-  </style>
+<meta charset="UTF-8">
+<title>FPS ESM Test</title>
+<style>
+  body { margin:0; overflow:hidden; }
+</style>
 </head>
 <body>
-<!-- three.js r149 非モジュール版 -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script type="module">
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.module.js';
+  import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/controls/PointerLockControls.js';
 
-<!-- PointerLockControls 非モジュール版 -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/examples/js/controls/PointerLockControls.js"></script>
-
-<script>
+  // 基本セットアップ
+  const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-  const controls = new THREE.PointerLockControls(camera, document.body); // ✅ ここで動く
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // PointerLockControls
+  const controls = new PointerLockControls(camera, document.body);
+
+  document.body.addEventListener('click', () => {
+    controls.lock(); // クリックでカーソルロック
+  });
+
+  // サンプル立方体
+  const geometry = new THREE.BoxGeometry();
+  const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  camera.position.z = 5;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    cube.rotation.x += 0.01;
+    cube.rotation.y += 0.01;
+    renderer.render(scene, camera);
+  }
+  animate();
 </script>
 </body>
 </html>
