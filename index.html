@@ -9,30 +9,15 @@
   </style>
 </head>
 <body>
-  <!-- three.js 本体 (非モジュール版) -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<!-- three.js r149 非モジュール版 -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 
-  <!-- PointerLockControls (非モジュール版) -->
- <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/examples/js/controls/PointerLockControls.js"></script>
+<!-- PointerLockControls 非モジュール版 -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/examples/js/controls/PointerLockControls.js"></script>
 
-  <script>
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    // ✅ 正しい書き方（非モジュール版）
-    const controls = new THREE.PointerLockControls(camera, document.body);
-
-    scene.add(controls.getObject());
-    camera.position.z = 5;
-
-    function animate() {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-    }
-    animate();
-  </script>
+<script>
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+  const controls = new THREE.PointerLockControls(camera, document.body); // ✅ ここで動く
+</script>
 </body>
 </html>
