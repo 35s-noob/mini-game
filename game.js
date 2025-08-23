@@ -1,3 +1,6 @@
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.module.js';
+import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/controls/PointerLockControls.js';
+
 // Three.js 基本設定
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
