@@ -9,9 +9,12 @@
 </head>
 <body>
 <script type="module">
-  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.module.js';
-  import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/controls/PointerLockControls.js';
-
+  // cdnjsからのURLを試す
+  import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.156.0/three.module.min.js';
+  import { PointerLockControls } from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.156.0/controls/PointerLockControls.min.js';
+  // ...
+</script>
+<script>
   // 基本セットアップ
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
