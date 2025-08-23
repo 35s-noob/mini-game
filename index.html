@@ -1,45 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>Team Battle Shooter</title>
-<link rel="stylesheet" href="style.css">
+<title>FPS 3D Game</title>
+<style>
+  body { margin: 0; overflow: hidden; }
+  #killLog {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 350px;
+    color: white;
+    font-family: Arial;
+    font-size: 14px;
+  }
+  #weaponSelect {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.5);
+    color: white;
+    font-family: Arial;
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+</style>
 </head>
 <body>
-
-<div id="settings">
-    <h2>初期設定</h2>
-    <label>ユーザー名: <input type="text" id="playerName" value="Player#1234"></label><br>
-    <label>色:
-        <select id="playerColor">
-            <option value="blue">Blue</option>
-            <option value="red">Red</option>
-            <option value="green">Green</option>
-            <option value="yellow">Yellow</option>
-        </select>
-    </label><br>
-    <label>初期武器:
-        <select id="playerWeapon">
-            <option>Combat Assault Rifle</option>
-            <option>Tactical Assault Rifle</option>
-            <option>Surge Assault Rifle</option>
-            <option>Elite Assault Rifle</option>
-            <option>Burst Shotgun</option>
-            <option>Light Submachine Gun</option>
-            <option>Compact Submachine Gun</option>
-            <option>Light Sniper Rifle</option>
-            <option>Heavy Sniper Rifle</option>
-            <option>Strike Pistol</option>
-            <option>Magnum Pistol</option>
-        </select>
-    </label><br>
-    <button id="startGame">ゲーム開始</button>
-</div>
-
-<canvas id="gameCanvas" style="display:none;"></canvas>
 <div id="killLog"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.7/dist/peerjs.min.js"></script>
+<select id="weaponSelect">
+  <option>Combat Assault Rifle</option>
+  <option>Tactical Assault Rifle</option>
+  <option>Surge Assault Rifle</option>
+  <option>Elite Assault Rifle</option>
+  <option>Burst Shotgun</option>
+  <option>Light Submachine Gun</option>
+  <option>Compact Submachine Gun</option>
+  <option>Light Sniper Rifle</option>
+  <option>Heavy Sniper Rifle</option>
+  <option>Strike Pistol</option>
+  <option>Magnum Pistol</option>
+</select>
+<script src="https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.156.1/examples/js/controls/PointerLockControls.js"></script>
 <script src="game.js"></script>
 </body>
 </html>
