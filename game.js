@@ -6,13 +6,13 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// プレイヤーFPS操作
+// FPS操作
 const controls = new THREE.PointerLockControls(camera, document.body);
-document.body.addEventListener('click', () => controls.lock());
+document.body.addEventListener('click', ()=>controls.lock());
 camera.position.set(0,2,5);
 
 // 平地
-const groundGeo = new THREE.BoxGeometry(50, 1, 50);
+const groundGeo = new THREE.BoxGeometry(50,1,50);
 const groundMat = new THREE.MeshBasicMaterial({color:0x228B22});
 const ground = new THREE.Mesh(groundGeo, groundMat);
 ground.position.y = -0.5;
@@ -77,9 +77,23 @@ window.addEventListener('click', ()=>{
     }
 });
 
+// キー移動
+const keys = {};
+window.addEventListener('keydown', e=>keys[e.key.toLowerCase()]=true);
+window.addEventListener('keyup', e=>keys[e.key.toLowerCase()]=false);
+
+function updatePlayer(){
+    const speed = 0.1;
+    if(keys['w']) controls.moveForward(speed);
+    if(keys['s']) controls.moveForward(-speed);
+    if(keys['a']) controls.moveRight(-speed);
+    if(keys['d']) controls.moveRight(speed);
+}
+
 // アニメーションループ
 function animate(){
     requestAnimationFrame(animate);
+    updatePlayer();
     mobs.forEach(m=>m.moveTowardsPlayer());
     renderer.render(scene, camera);
 }
