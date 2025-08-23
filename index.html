@@ -14,35 +14,15 @@
     font-family: Arial;
     font-size: 14px;
   }
-  #weaponSelect {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.5);
-    color: white;
-    font-family: Arial;
-    padding: 5px 10px;
-    border-radius: 5px;
-  }
 </style>
 </head>
 <body>
 <div id="killLog"></div>
-<select id="weaponSelect">
-  <option>Combat Assault Rifle</option>
-  <option>Tactical Assault Rifle</option>
-  <option>Surge Assault Rifle</option>
-  <option>Elite Assault Rifle</option>
-  <option>Burst Shotgun</option>
-  <option>Light Submachine Gun</option>
-  <option>Compact Submachine Gun</option>
-  <option>Light Sniper Rifle</option>
-  <option>Heavy Sniper Rifle</option>
-  <option>Strike Pistol</option>
-  <option>Magnum Pistol</option>
-</select>
 
-<script type="module" src="./game.js"></script>
+<!-- r149 Three.js -->
+<script src="./js/three.min.js"></script>
+<!-- PointerLockControls -->
+<script src="./js/PointerLockControls.js"></script>
+<script src="./game.js"></script>
 </body>
 </html>
