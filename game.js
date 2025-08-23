@@ -1,17 +1,14 @@
-// 相対パスでモジュールを読み込む
-import * as THREE from './three.module.js';
-import { PointerLockControls } from './PointerLockControls.js';
-
-// シーン・カメラ・レンダラー
+// THREE と PointerLockControls はグローバルで使用可能
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
+
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // FPS操作
-const controls = new PointerLockControls(camera, document.body);
+const controls = new THREE.PointerLockControls(camera, document.body);
 document.body.addEventListener('click', ()=>controls.lock());
 camera.position.set(0,2,5);
 
@@ -23,13 +20,7 @@ const ground = new THREE.Mesh(
 ground.position.y = -0.5;
 scene.add(ground);
 
-// 武器
-let currentWeapon = document.getElementById('weaponSelect').value;
-document.getElementById('weaponSelect').addEventListener('change', e=>{
-  currentWeapon = e.target.value;
-});
-
-// モブクラス
+// 簡単なモブ
 class Mob {
     constructor(type, x, z){
         this.type = type;
@@ -48,26 +39,24 @@ class Mob {
     }
 }
 
-// 初期モブ
 const mobs = [new Mob("zombie",5,0), new Mob("skeleton",-5,0)];
 
 // キルログ
 const killLog = [];
-const maxLog = 5;
-const actions = [
- { action: "killed", connector: "with" },
- { action: "eliminated", connector: "with" },
- { action: "destroyed", connector: "using" }
-];
-function addKillLog(mobType, weapon){
+function addKillLog(mobType){
+    const actions = [
+     { action: "killed", connector: "with" },
+     { action: "eliminated", connector: "with" },
+     { action: "destroyed", connector: "using" }
+    ];
     const {action, connector} = actions[Math.floor(Math.random()*actions.length)];
-    const logText = `Player#1234 ${action} ${mobType} ${connector} ${weapon}`;
+    const logText = `Player#1234 ${action} ${mobType} ${connector} Combat Assault Rifle`;
     killLog.unshift(logText);
-    if(killLog.length>maxLog) killLog.pop();
+    if(killLog.length>5) killLog.pop();
     document.getElementById('killLog').innerHTML = killLog.map(l=>`<div>${l}</div>`).join('');
 }
 
-// 射撃
+// 射撃（クリックでモブを撃つ）
 window.addEventListener('click', ()=>{
     const raycaster = new THREE.Raycaster();
     const dir = new THREE.Vector3();
@@ -79,7 +68,7 @@ window.addEventListener('click', ()=>{
         mob.hp -= 50;
         if(mob.hp<=0){
             scene.remove(mob.mesh);
-            addKillLog(mob.type, currentWeapon);
+            addKillLog(mob.type);
         }
     }
 });
