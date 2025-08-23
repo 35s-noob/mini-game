@@ -1,8 +1,8 @@
-// ES Modules 形式で import
+// CDN URL から Three.js と PointerLockControls を読み込む
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.module.js';
 import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/controls/PointerLockControls.js';
 
-// 基本設定
+// シーン・カメラ・レンダラー
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
@@ -15,10 +15,11 @@ const controls = new PointerLockControls(camera, document.body);
 document.body.addEventListener('click', ()=>controls.lock());
 camera.position.set(0,2,5);
 
-// 平地
-const groundGeo = new THREE.BoxGeometry(50,1,50);
-const groundMat = new THREE.MeshBasicMaterial({color:0x228B22});
-const ground = new THREE.Mesh(groundGeo, groundMat);
+// 地面
+const ground = new THREE.Mesh(
+  new THREE.BoxGeometry(50,1,50),
+  new THREE.MeshBasicMaterial({color:0x228B22})
+);
 ground.position.y = -0.5;
 scene.add(ground);
 
@@ -28,7 +29,7 @@ document.getElementById('weaponSelect').addEventListener('change', e=>{
   currentWeapon = e.target.value;
 });
 
-// モブ
+// モブクラス
 class Mob {
     constructor(type, x, z){
         this.type = type;
@@ -46,6 +47,8 @@ class Mob {
         this.mesh.position.add(dir.multiplyScalar(0.02));
     }
 }
+
+// 初期モブ配置
 const mobs = [new Mob("zombie",5,0), new Mob("skeleton",-5,0)];
 
 // キルログ
