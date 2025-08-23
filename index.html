@@ -2,15 +2,15 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>TopDown Shooter PVP</title>
+<title>Team Battle Shooter</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="settings">
-    <h2>Player Settings</h2>
-    <label>Player Name: <input type="text" id="playerName" value="Player#1234"></label><br>
-    <label>Color: 
+    <h2>初期設定</h2>
+    <label>ユーザー名: <input type="text" id="playerName" value="Player#1234"></label><br>
+    <label>色:
         <select id="playerColor">
             <option value="blue">Blue</option>
             <option value="red">Red</option>
@@ -18,7 +18,7 @@
             <option value="yellow">Yellow</option>
         </select>
     </label><br>
-    <label>Starting Weapon:
+    <label>初期武器:
         <select id="playerWeapon">
             <option>Combat Assault Rifle</option>
             <option>Tactical Assault Rifle</option>
@@ -33,7 +33,7 @@
             <option>Magnum Pistol</option>
         </select>
     </label><br>
-    <button id="startGame">Start Game</button>
+    <button id="startGame">ゲーム開始</button>
 </div>
 
 <canvas id="gameCanvas" style="display:none;"></canvas>
