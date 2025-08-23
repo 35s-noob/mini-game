@@ -1,6 +1,6 @@
 // CDN URL から Three.js と PointerLockControls を読み込む
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.module.js";
-import { PointerLockControls } from "https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/controls/PointerLockControls.js";
+import * as THREE from `https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.module.js`;
+import { PointerLockControls } from `https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/controls/PointerLockControls.js`;
 
 // シーン・カメラ・レンダラー
 const scene = new THREE.Scene();
