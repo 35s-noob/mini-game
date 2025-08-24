@@ -4,47 +4,268 @@
 <meta charset="UTF-8">
 <title>FPS ESM Test</title>
 <style>
-  body { margin:0; overflow:hidden; }
+  body { margin:0; overflow:hidden; }
+  #killLog {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: white;
+    font-family: monospace;
+    font-size: 14px;
+    text-align: right;
+  }
 </style>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.156.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.156.1/examples/jsm/"
+    }
+  }
+</script>
 </head>
 <body>
+<div id="killLog"></div>
+
 <script type="module">
-  // cdnjsからのURLを試す
-  import * as THREE from './three.module.js';
-  import { PointerLockControls } from './PointerLockControls.js';
-  // ... rest of your code
-</script>
-</script>
-<script>
-  // 基本セットアップ
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-  const renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+  import * as THREE from "three";
+  import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 
-  // PointerLockControls
-  const controls = new PointerLockControls(camera, document.body);
+  // シーンとカメラ、レンダラーの設定
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x87ceeb);
 
-  document.body.addEventListener('click', () => {
-    controls.lock(); // クリックでカーソルロック
-  });
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.5, 1000);
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
 
-  // サンプル立方体
-  const geometry = new THREE.BoxGeometry();
-  const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  const cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
+  window.addEventListener('resize', onWindowResize, false);
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
 
-  camera.position.z = 5;
+  // FPS操作
+  const controls = new PointerLockControls(camera, document.body);
+  document.body.addEventListener('click', () => controls.lock());
+  camera.position.set(0, 1.5, 5);
 
-  function animate() {
-    requestAnimationFrame(animate);
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
-    renderer.render(scene, camera);
-  }
-  animate();
+  // ジャンプ機能のための変数
+  const velocity = new THREE.Vector3();
+  const direction = new THREE.Vector3();
+  let isGrounded = true;
+
+  // テクスチャの読み込み
+  const textureLoader = new THREE.TextureLoader();
+  const grassTexture = textureLoader.load('https://cdn.pixabay.com/photo/2013/07/13/11/48/grass-158867_960_720.png');
+  const woodTexture = textureLoader.load('https://cdn.pixabay.com/photo/2013/07/13/13/46/texture-161427_960_720.png');
+
+  // マテリアルの作成
+  const groundMaterial = new THREE.MeshLambertMaterial({ map: grassTexture });
+  const blockMaterial = new THREE.MeshLambertMaterial({ map: woodTexture });
+
+  // 地面
+  const ground = new THREE.Mesh(
+    new THREE.BoxGeometry(50, 1, 50),
+    groundMaterial
+  );
+  ground.position.y = -0.5;
+  scene.add(ground);
+
+  // ブロックを格納する配列
+  const blocks = [];
+
+  // 簡単なモブ
+  class Mob {
+    constructor(type, x, z) {
+      this.type = type;
+      this.mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 2, 1),
+        new THREE.MeshBasicMaterial({ color: type === "zombie" ? 0x00ff00 : 0x808080 })
+      );
+      this.mesh.position.set(x, 1, z);
+      scene.add(this.mesh);
+      this.hp = 100;
+    }
+    moveTowardsPlayer() {
+      const dir = new THREE.Vector3();
+      dir.subVectors(camera.position, this.mesh.position).normalize();
+      this.mesh.position.add(dir.multiplyScalar(0.02));
+    }
+  }
+
+  const mobs = [new Mob("zombie", 5, 0), new Mob("skeleton", -5, 0)];
+
+  // キルログ
+  const killLog = [];
+  function addKillLog(mobType) {
+    const actions = [
+      { action: "killed", connector: "with" },
+      { action: "eliminated", connector: "with" },
+      { action: "destroyed", connector: "using" }
+    ];
+    const { action, connector } = actions[Math.floor(Math.random() * actions.length)];
+    const logText = `Player#1234 ${action} ${mobType} ${connector} Combat Assault Rifle`;
+    killLog.unshift(logText);
+    if (killLog.length > 5) killLog.pop();
+    document.getElementById('killLog').innerHTML = killLog.map(l => `<div>${l}</div>`).join('');
+  }
+
+  // 光源の追加
+  const ambientLight = new THREE.AmbientLight(0x404040);
+  scene.add(ambientLight);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+  directionalLight.position.set(10, 10, 5);
+  scene.add(directionalLight);
+
+  // 射撃（左クリックでモブを撃つ）
+  window.addEventListener('click', (event) => {
+    if (event.button === 0) {
+      const raycaster = new THREE.Raycaster();
+      const dir = new THREE.Vector3();
+      camera.getWorldDirection(dir);
+      raycaster.set(camera.position, dir);
+      const intersects = raycaster.intersectObjects(mobs.map(m => m.mesh));
+      if (intersects.length > 0) {
+        const mob = mobs.find(m => m.mesh === intersects[0].object);
+        mob.hp -= 50;
+        if (mob.hp <= 0) {
+          scene.remove(mob.mesh);
+          addKillLog(mob.type);
+        }
+      }
+    }
+  });
+
+  // ブロックを設置する関数
+  function placeBlock() {
+    const raycaster = new THREE.Raycaster();
+    const dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    raycaster.set(camera.position, dir);
+    
+    const objectsToIntersect = [ground, ...blocks]; 
+    const intersects = raycaster.intersectObjects(objectsToIntersect);
+
+    if (intersects.length > 0) {
+      const intersection = intersects[0];
+      const face = intersection.face;
+      const normal = face.normal;
+      const newBlockPos = intersection.point.clone();
+
+      newBlockPos.x += normal.x * 0.5;
+      newBlockPos.y += normal.y * 0.5;
+      newBlockPos.z += normal.z * 0.5;
+
+      const block = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        blockMaterial
+      );
+      block.position.copy(newBlockPos).round();
+      scene.add(block);
+      blocks.push(block);
+    }
+  }
+
+  // ブロックを破壊する関数 (右クリック)
+  function destroyBlock() {
+    const raycaster = new THREE.Raycaster();
+    const dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    raycaster.set(camera.position, dir);
+
+    // 地面は破壊しない
+    const objectsToIntersect = blocks;
+    const intersects = raycaster.intersectObjects(objectsToIntersect);
+
+    if (intersects.length > 0) {
+      const blockToRemove = intersects[0].object;
+      scene.remove(blockToRemove);
+      const index = blocks.indexOf(blockToRemove);
+      if (index > -1) {
+        blocks.splice(index, 1);
+      }
+    }
+  }
+
+  // キー移動とブロック設置/破壊
+  const keys = {};
+  window.addEventListener('keydown', e => {
+      keys[e.key.toLowerCase()] = true;
+  });
+  window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+  // 右クリックでコンテキストメニューが出ないようにする
+  window.addEventListener('contextmenu', e => e.preventDefault());
+
+  // 右クリックでブロックを破壊
+  window.addEventListener('mousedown', e => {
+    if (e.button === 2) { // 2は右クリック
+      destroyBlock();
+    }
+  });
+  
+  // 'e'キーでブロックを設置
+  window.addEventListener('keydown', e => {
+    if (e.key.toLowerCase() === 'e') {
+      placeBlock();
+    }
+  });
+
+  // 移動ロジックの修正
+  function updatePlayer() {
+    const speed = 0.1;
+    const playerObject = controls.getObject();
+    
+    direction.x = 0;
+    direction.z = 0;
+    
+    if (keys['s']) direction.z -= 1;
+    if (keys['w']) direction.z += 1;
+    if (keys['a']) direction.x -= 1;
+    if (keys['d']) direction.x += 1;
+    
+    if (isGrounded) {
+      velocity.y = 0;
+      if (keys[' ']) {
+        velocity.y = 0.5;
+        isGrounded = false;
+      }
+    }
+    
+    velocity.y -= 0.03;
+    
+    const cameraDirection = new THREE.Vector3();
+    camera.getWorldDirection(cameraDirection);
+    cameraDirection.y = 0;
+    cameraDirection.normalize();
+    
+    const right = new THREE.Vector3();
+    right.crossVectors(cameraDirection, new THREE.Vector3(0, 1, 0)).normalize();
+    
+    const moveZ = cameraDirection.clone().multiplyScalar(direction.z * speed);
+    const moveX = right.clone().multiplyScalar(direction.x * speed);
+    
+    playerObject.position.add(moveZ);
+    playerObject.position.add(moveX);
+    playerObject.position.y += velocity.y;
+    
+    if (playerObject.position.y < 1.5) {
+      playerObject.position.y = 1.5;
+      isGrounded = true;
+    }
+  }
+
+  // アニメーションループ
+  function animate() {
+    requestAnimationFrame(animate);
+    updatePlayer();
+    mobs.forEach(m => m.moveTowardsPlayer());
+    renderer.render(scene, camera);
+  }
+  animate();
 </script>
 </body>
 </html>
